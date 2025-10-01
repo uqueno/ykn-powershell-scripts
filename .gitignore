@@ -1,0 +1,36 @@
+# PowerShell specific
+*.ps1.save
+*.ps1~
+
+# Logs / temp
+*.log
+*.tmp
+*.bak
+*.old
+
+# SSH keys (DO NOT COMMIT PRIVATE KEYS)
+*.pem
+*.ppk
+id_rsa
+id_ecdsa
+id_ed25519
+id_rsa.pub
+id_ecdsa.pub
+id_ed25519.pub
+
+# VS Code
+.vscode/
+.history/
+
+# OS noise
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Tooling
+PesterTestResults.xml
+Coverage.xml
+
+# Misc
+*.swp
