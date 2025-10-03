@@ -1,4 +1,4 @@
-# SSH Connection Tester Script Documentation
+# SSH Connection Tester - Documentation
 
 **Script Name**: `SSH-Connection-Tester.ps1`  
 **Version**: 1.0  
@@ -29,9 +29,11 @@
 ## Overview
 
 ### 🎯 Purpose
+
 The SSH Connection Tester is an advanced PowerShell script designed to parse SSH configuration files, provide interactive testing of multiple SSH connections, and facilitate seamless VS Code Remote-SSH integration. It serves as a diagnostic and validation tool for SSH infrastructure management.
 
 ### 🔧 Core Capabilities
+
 - **Automatic SSH Config Parsing**: Reads and interprets standard SSH config files
 - **Interactive Connection Testing**: Menu-driven interface for selective connection testing
 - **Bulk Testing Support**: Test all connections simultaneously with aggregated results
@@ -40,6 +42,7 @@ The SSH Connection Tester is an advanced PowerShell script designed to parse SSH
 - **System Information Gathering**: Remote system details for successful connections
 
 ### 🎪 Use Cases
+
 - SSH infrastructure validation
 - VS Code Remote-SSH setup verification
 - Connection troubleshooting and diagnostics
@@ -52,7 +55,8 @@ The SSH Connection Tester is an advanced PowerShell script designed to parse SSH
 ## Architecture & Design
 
 ### 📊 Script Structure
-```
+
+```text
 SSH-Connection-Tester.ps1
 ├── Parameters & Configuration
 ├── Core Functions
@@ -67,6 +71,7 @@ SSH-Connection-Tester.ps1
 ```
 
 ### 🔄 Data Flow
+
 1. **Input**: SSH config file path (default: `%USERPROFILE%\.ssh\config`)
 2. **Parsing**: Extract host definitions with connection parameters
 3. **Validation**: Verify config completeness and accessibility
@@ -76,6 +81,7 @@ SSH-Connection-Tester.ps1
 7. **Reporting**: Provide detailed results and next-step guidance
 
 ### 🏗️ Design Principles
+
 - **Modularity**: Separate functions for parsing and testing
 - **Extensibility**: Easy addition of new testing methods
 - **User Experience**: Clear, intuitive interface with helpful feedback
@@ -87,7 +93,9 @@ SSH-Connection-Tester.ps1
 ## Features & Functionality
 
 ### 🔍 SSH Config Parsing
+
 **Function**: `Get-SSHHosts`
+
 - **Input**: SSH config file path
 - **Output**: Array of connection objects
 - **Supported Parameters**:
@@ -98,6 +106,7 @@ SSH-Connection-Tester.ps1
   - `Port` - SSH port (default: 22)
 
 **Parsing Logic**:
+
 ```powershell
 # Regex patterns for config parsing
 Host Pattern:       "^Host\s+(.+)$"
@@ -108,25 +117,31 @@ Port Pattern:       "^\s*Port\s+(.+)$"
 ```
 
 ### 🧪 Connection Testing
+
 **Function**: `Test-Connection`
+
 - **Authentication Method**: SSH key-based (BatchMode)
 - **Timeout**: 5 seconds connection timeout
 - **Test Command**: `whoami` (minimal system impact)
 - **Return**: Boolean success/failure status
 
 **Test Parameters**:
+
 - `-o ConnectTimeout=5`: Prevents hanging connections
 - `-o BatchMode=yes`: Disables interactive prompts
 - `2>&1`: Captures both stdout and stderr
 
 ### 🖥️ Interactive Interface
+
 **Menu Options**:
+
 - **Numbered Selection**: Test individual connections (1-N)
 - **Bulk Testing**: Test all connections simultaneously (A)
 - **Exit**: Graceful termination (Q)
 
 **Display Format**:
-```
+
+```text
 [1] connection-name (user@hostname:port)
 [2] connection-name (user@hostname:port)
 [A] Test All
@@ -138,12 +153,16 @@ Port Pattern:       "^\s*Port\s+(.+)$"
 ## Technical Implementation
 
 ### 🔧 Variable Management
+
 **PowerShell Reserved Variable Conflicts Resolved**:
+
 - `$Host` → `$ConnectionInfo` (function parameter)
 - `$sshHost` → `$connection` (loop variables)
 
 ### 📝 Data Structures
+
 **Connection Object Schema**:
+
 ```powershell
 $connectionObject = @{
     Name = "string"           # SSH config host alias
@@ -155,6 +174,7 @@ $connectionObject = @{
 ```
 
 ### 🔄 Error Handling Patterns
+
 ```powershell
 try {
     # SSH connection attempt
@@ -170,6 +190,7 @@ try {
 ```
 
 ### ⚡ Performance Optimizations
+
 - **Lazy Loading**: Config parsed only once at startup
 - **Timeout Controls**: Prevents hanging on failed connections
 - **Batch Mode**: Eliminates interactive authentication delays
@@ -180,6 +201,7 @@ try {
 ## Usage Guide
 
 ### 🚀 Basic Usage
+
 ```powershell
 # Run with default SSH config location
 .\SSH-Connection-Tester.ps1
@@ -189,6 +211,7 @@ try {
 ```
 
 ### 📋 Interactive Workflow
+
 1. **Launch Script**: Execute PowerShell script
 2. **Review Connections**: View parsed SSH connections from config
 3. **Select Option**: Choose individual connection, bulk test, or quit
@@ -196,8 +219,10 @@ try {
 5. **Follow Guidance**: Use provided VS Code integration steps
 
 ### 🎯 Integration Examples
+
 **VS Code Remote-SSH Setup**:
-```
+
+```text
 After successful test:
 1. Ctrl+Shift+P
 2. Remote-SSH: Connect to Host
@@ -205,6 +230,7 @@ After successful test:
 ```
 
 **Automated Testing**:
+
 ```powershell
 # Capture results for automation
 $results = & .\SSH-Connection-Tester.ps1 | Out-String
@@ -215,7 +241,9 @@ $results = & .\SSH-Connection-Tester.ps1 | Out-String
 ## Configuration Support
 
 ### 📄 SSH Config Compatibility
+
 **Supported OpenSSH Config Features**:
+
 - Multiple host definitions
 - Host aliases and wildcards (filtered)
 - Standard connection parameters
@@ -223,6 +251,7 @@ $results = & .\SSH-Connection-Tester.ps1 | Out-String
 - Custom port configurations
 
 **Example SSH Config**:
+
 ```ssh
 Host production-server
     HostName prod.example.com
@@ -237,6 +266,7 @@ Host development-server
 ```
 
 ### 🔧 Parameter Precedence
+
 1. Explicit host configuration values
 2. SSH config file defaults
 3. Script default values (Port: 22)
@@ -247,26 +277,31 @@ Host development-server
 
 ### 🛡️ Error Categories
 
-#### **Config File Errors**:
+#### **Config File Errors**
+
 - **File Not Found**: Graceful degradation with clear error message
 - **Parse Errors**: Continue with valid entries, log invalid sections
 - **Access Permissions**: Inform user of permission requirements
 
-#### **Network Errors**:
+#### **Network Errors**
+
 - **DNS Resolution**: Clear indication of hostname resolution failures
 - **Connection Timeout**: Timeout handling with informative messages
 - **Port Unreachable**: Specific network connectivity feedback
 
-#### **Authentication Errors**:
+#### **Authentication Errors**
+
 - **Key Not Found**: Identity file validation and path verification
 - **Permission Denied**: Key permissions and server configuration guidance
 - **Key Format Issues**: Key type compatibility information
 
-#### **System Errors**:
+#### **System Errors**
+
 - **SSH Client Missing**: OpenSSH installation guidance
 - **PowerShell Version**: Compatibility requirements and upgrade paths
 
 ### 🔄 Recovery Strategies
+
 - **Partial Failures**: Continue testing remaining connections
 - **Configuration Issues**: Provide specific remediation steps
 - **Network Problems**: Suggest troubleshooting approaches
@@ -277,22 +312,26 @@ Host development-server
 
 ### ⚡ Optimization Strategies
 
-#### **Connection Testing**:
+#### **Connection Testing**
+
 - **Parallel Execution**: Future enhancement for simultaneous testing
 - **Connection Pooling**: Reuse established connections where applicable
 - **Caching**: Remember successful connections within session
 
-#### **Config Parsing**:
+#### **Config Parsing**
+
 - **Single Parse**: Config read once at script startup
 - **Incremental Updates**: Future support for config file monitoring
 - **Validation Caching**: Cache parsed config validation results
 
-#### **Memory Management**:
+#### **Memory Management**
+
 - **Object Cleanup**: Proper disposal of connection objects
 - **String Optimization**: Efficient string handling for large configs
 - **Resource Monitoring**: Memory usage optimization for bulk operations
 
 ### 📊 Performance Metrics
+
 - **Startup Time**: < 1 second for typical configurations
 - **Per-Connection Test**: < 6 seconds (including 5s timeout)
 - **Memory Footprint**: Minimal PowerShell object overhead
@@ -303,19 +342,22 @@ Host development-server
 
 ### 🎯 Phase 1 Enhancements (Near-term)
 
-#### **Advanced Testing Features**:
+#### **Advanced Testing Features**
+
 - **Parallel Connection Testing**: Concurrent SSH connection attempts
 - **Connection Performance Metrics**: Latency and throughput measurement
 - **Extended System Information**: Detailed remote system profiling
 - **Custom Test Commands**: User-configurable test command execution
 
-#### **User Interface Improvements**:
+#### **User Interface Improvements**
+
 - **Progress Indicators**: Real-time testing progress display
 - **Color-coded Results**: Enhanced visual feedback with status colors
 - **Connection Filtering**: Search and filter connections by criteria
 - **History Tracking**: Previous test results and comparison
 
-#### **Configuration Enhancements**:
+#### **Configuration Enhancements**
+
 - **Config Validation**: Pre-flight config file validation
 - **Multiple Config Support**: Ability to parse multiple SSH config files
 - **Profile Management**: Named testing profiles for different environments
@@ -323,19 +365,22 @@ Host development-server
 
 ### 🚀 Phase 2 Enhancements (Medium-term)
 
-#### **Integration Capabilities**:
+#### **Integration Capabilities**
+
 - **CI/CD Integration**: Export formats for build pipeline integration
 - **Monitoring Integration**: Integration with monitoring systems
 - **Logging Framework**: Structured logging with multiple output formats
 - **API Interface**: REST API for programmatic access
 
-#### **Advanced Diagnostics**:
+#### **Advanced Diagnostics**
+
 - **Network Diagnostics**: Traceroute, packet analysis, bandwidth testing
 - **Security Scanning**: SSH configuration security assessment
 - **Performance Profiling**: Connection establishment time analysis
 - **Health Monitoring**: Continuous connection health assessment
 
-#### **Reporting and Analytics**:
+#### **Reporting and Analytics**
+
 - **Dashboard Interface**: Web-based dashboard for connection status
 - **Historical Analytics**: Trend analysis and reporting capabilities
 - **Alert System**: Notification system for connection failures
@@ -343,13 +388,15 @@ Host development-server
 
 ### 🔮 Phase 3 Enhancements (Long-term)
 
-#### **Enterprise Features**:
+#### **Enterprise Features**
+
 - **Multi-tenant Support**: Organization and team-based access control
 - **Centralized Management**: Central configuration and policy management
 - **Audit Logging**: Comprehensive audit trail and compliance reporting
 - **Integration Ecosystem**: Plugin architecture for third-party integrations
 
-#### **AI and Automation**:
+#### **AI and Automation**
+
 - **Predictive Analytics**: Connection failure prediction and prevention
 - **Automated Remediation**: Self-healing connection configuration
 - **Smart Diagnostics**: AI-powered troubleshooting recommendations
@@ -361,46 +408,57 @@ Host development-server
 
 ### 🔍 Common Issues and Solutions
 
-#### **"Config file not found" Error**:
+#### **"Config file not found" Error**
+
 **Cause**: SSH config file doesn't exist at expected location  
-**Solution**: 
+**Solution**:
+
 - Verify SSH config file exists: `Test-Path "$env:USERPROFILE\.ssh\config"`
 - Create SSH config file if missing
 - Use `-ConfigPath` parameter to specify alternative location
 
-#### **"No SSH hosts found" Message**:
+#### **"No SSH hosts found" Message**
+
 **Cause**: SSH config file has no valid Host entries  
 **Solution**:
+
 - Check SSH config file format and syntax
 - Ensure Host entries don't use wildcards only
 - Verify proper indentation and parameter formatting
 
-#### **SSH Connection Timeout**:
+#### **SSH Connection Timeout**
+
 **Cause**: Network connectivity issues or server unavailability  
 **Solution**:
+
 - Verify target server hostname/IP resolution
 - Check network connectivity: `Test-NetConnection hostname`
 - Confirm SSH service running on target port
 - Review firewall and security group settings
 
-#### **Authentication Failures**:
+#### **Authentication Failures**
+
 **Cause**: SSH key issues or server configuration problems  
 **Solution**:
+
 - Verify identity file exists and has correct permissions
 - Test key manually: `ssh -i keyfile user@host`
 - Check server authorized_keys configuration
 - Validate key format and type compatibility
 
-#### **"SSH command not found" Error**:
+#### **"SSH command not found" Error**
+
 **Cause**: OpenSSH client not installed or not in PATH  
 **Solution**:
+
 - Install OpenSSH client: `Add-WindowsCapability -Online -Name OpenSSH.Client*`
 - Verify PATH includes SSH executable location
 - Use full path to SSH executable if necessary
 
 ### 🛠️ Diagnostic Commands
 
-#### **SSH Configuration Validation**:
+#### **SSH Configuration Validation**
+
 ```powershell
 # Test SSH config syntax
 ssh -F $env:USERPROFILE\.ssh\config -T git@github.com
@@ -412,7 +470,8 @@ ssh -v -o ConnectTimeout=5 hostname
 icacls "path\to\private\key"
 ```
 
-#### **Network Diagnostics**:
+#### **Network Diagnostics**
+
 ```powershell
 # Test network connectivity
 Test-NetConnection -ComputerName hostname -Port 22
@@ -431,37 +490,45 @@ Test-NetConnection -ComputerName hostname -TraceRoute
 ### 📚 Function Documentation
 
 #### `Get-SSHHosts`
+
 **Purpose**: Parse SSH configuration file and extract host definitions
 
 **Syntax**:
+
 ```powershell
 Get-SSHHosts -ConfigFile <String>
 ```
 
 **Parameters**:
+
 - `ConfigFile` (String): Path to SSH configuration file
 
 **Returns**: Array of hashtables containing connection parameters
 
 **Example**:
+
 ```powershell
 $hosts = Get-SSHHosts -ConfigFile "$env:USERPROFILE\.ssh\config"
 ```
 
 #### `Test-Connection`
+
 **Purpose**: Test SSH connection to specified host configuration
 
 **Syntax**:
+
 ```powershell
 Test-Connection -ConnectionInfo <Hashtable>
 ```
 
 **Parameters**:
+
 - `ConnectionInfo` (Hashtable): Host connection parameters object
 
 **Returns**: Boolean indicating connection success/failure
 
 **Example**:
+
 ```powershell
 $success = Test-Connection -ConnectionInfo $hostObject
 ```
@@ -469,6 +536,7 @@ $success = Test-Connection -ConnectionInfo $hostObject
 ### 🔧 Script Parameters
 
 #### `ConfigPath`
+
 - **Type**: String
 - **Default**: `$env:USERPROFILE\.ssh\config`
 - **Purpose**: Specify alternative SSH configuration file location
@@ -480,36 +548,42 @@ $success = Test-Connection -ConnectionInfo $hostObject
 
 ### 🔨 Technical Decisions
 
-#### **PowerShell Version Compatibility**:
+#### **PowerShell Version Compatibility**
+
 - **Target**: PowerShell 5.1+ (Windows PowerShell compatibility)
 - **Considerations**: Cross-platform PowerShell Core support for future versions
 - **Dependencies**: Native SSH client (OpenSSH)
 
-#### **Error Handling Strategy**:
+#### **Error Handling Strategy**
+
 - **Philosophy**: Fail gracefully with actionable error messages
 - **Implementation**: Try-catch blocks with specific exception handling
 - **User Experience**: Clear guidance for error resolution
 
-#### **Performance Trade-offs**:
+#### **Performance Trade-offs**
+
 - **Sequential Testing**: Chosen for simplicity and clear progress indication
 - **Timeout Management**: Balance between responsiveness and reliability
 - **Memory Usage**: Optimized for typical SSH config file sizes
 
 ### 🧪 Testing Strategy
 
-#### **Unit Testing Scope**:
+#### **Unit Testing Scope**
+
 - SSH config parsing accuracy
 - Connection parameter extraction
 - Error handling coverage
 - Edge case validation
 
-#### **Integration Testing**:
+#### **Integration Testing**
+
 - Real SSH server connectivity
 - Various SSH configuration formats
 - Network failure scenarios
 - Authentication method validation
 
-#### **User Acceptance Testing**:
+#### **User Acceptance Testing**
+
 - Interactive workflow validation
 - VS Code integration verification
 - Cross-platform compatibility
@@ -517,13 +591,15 @@ $success = Test-Connection -ConnectionInfo $hostObject
 
 ### 📝 Code Quality Standards
 
-#### **PowerShell Best Practices**:
+#### **PowerShell Best Practices**
+
 - Approved verb usage for functions
 - Consistent parameter naming conventions
 - Proper error handling patterns
 - Clear variable naming and scoping
 
-#### **Documentation Requirements**:
+#### **Documentation Requirements**
+
 - Function header comments with examples
 - Parameter descriptions and validation
 - Return value specifications
@@ -531,13 +607,15 @@ $success = Test-Connection -ConnectionInfo $hostObject
 
 ### 🔄 Maintenance Considerations
 
-#### **Version Management**:
+#### **Version Management**
+
 - Semantic versioning for releases
 - Backwards compatibility preservation
 - Migration guides for breaking changes
 - Feature deprecation lifecycle
 
-#### **Dependency Management**:
+#### **Dependency Management**
+
 - Minimal external dependencies
 - Clear prerequisite documentation
 - Fallback strategies for missing components
@@ -549,7 +627,8 @@ $success = Test-Connection -ConnectionInfo $hostObject
 
 ### 📋 Appendix A: SSH Config Reference
 
-#### **Supported Parameters**:
+#### **Supported Parameters**
+
 | Parameter | Description | Default | Required |
 |-----------|-------------|---------|----------|
 | Host | Connection alias | N/A | Yes |
@@ -558,7 +637,8 @@ $success = Test-Connection -ConnectionInfo $hostObject
 | IdentityFile | Private key path | Default keys | No |
 | Port | SSH port | 22 | No |
 
-#### **Example Configuration**:
+#### **Example Configuration**
+
 ```ssh
 # Development Environment
 Host dev-server
@@ -577,13 +657,15 @@ Host prod-server
 
 ### 📋 Appendix B: VS Code Integration
 
-#### **Remote-SSH Extension Setup**:
+#### **Remote-SSH Extension Setup**
+
 1. Install Remote-SSH extension from VS Code Marketplace
 2. Ensure SSH configuration is properly formatted
 3. Test connections using this script before VS Code usage
 4. Follow script-provided connection guidance
 
-#### **Troubleshooting VS Code Connections**:
+#### **Troubleshooting VS Code Connections**
+
 - Clear VS Code remote connection cache if issues persist
 - Verify SSH keys work with this script first
 - Check VS Code logs for specific error details
@@ -591,13 +673,15 @@ Host prod-server
 
 ### 📋 Appendix C: Security Considerations
 
-#### **SSH Key Security**:
+#### **SSH Key Security**
+
 - Use appropriate file permissions (600 for private keys)
 - Implement key rotation policies
 - Monitor key usage and access patterns
 - Use strong key algorithms (ED25519, RSA 4096+)
 
-#### **Network Security**:
+#### **Network Security**
+
 - Implement proper firewall rules
 - Use non-standard SSH ports where appropriate
 - Enable SSH connection logging

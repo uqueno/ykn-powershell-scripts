@@ -8,6 +8,7 @@
 ## 🔍 Problem Analysis
 
 This error occurs when:
+
 - VS Code Remote-SSH extension conflicts with Node.js versions
 - Cached VS Code server data is corrupted on remote server
 - Extension compatibility issues with newer Node.js globals
