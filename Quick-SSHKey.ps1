@@ -1,11 +1,13 @@
 # Quick SSH Key Generator for Contabo VPS
 # Uses predefined parameters for quick key generation
 
+
 # Default parameters based on your current setup
+$today = Get-Date -Format yyyyMMdd
 $DefaultParams = @{
     Hosting = "contabo-vps"
     Encryption = "ed25519-key"
-    Timestamp = "20250923"
+    Timestamp = $today
     Protocol = "ssh"
     UserInstance = "portainer@vmi2747748"
     Client = "zest"
@@ -42,8 +44,9 @@ switch ($choice) {
         $encryption = Read-Host "Encryption type [$($DefaultParams.Encryption)]"
         if ([string]::IsNullOrWhiteSpace($encryption)) { $encryption = $DefaultParams.Encryption }
         
-        $timestamp = Read-Host "Timestamp [$($DefaultParams.Timestamp)]"
-        if ([string]::IsNullOrWhiteSpace($timestamp)) { $timestamp = $DefaultParams.Timestamp }
+
+    $timestamp = Read-Host "Timestamp [$($DefaultParams.Timestamp)] (press Enter for today's date)"
+    if ([string]::IsNullOrWhiteSpace($timestamp)) { $timestamp = (Get-Date -Format yyyyMMdd) }
         
         $protocol = Read-Host "Protocol [$($DefaultParams.Protocol)]"
         if ([string]::IsNullOrWhiteSpace($protocol)) { $protocol = $DefaultParams.Protocol }
