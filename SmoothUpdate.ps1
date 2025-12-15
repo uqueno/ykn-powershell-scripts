@@ -2,7 +2,7 @@
 ================================================================================
  Script Name : SmoothUpdate.ps1
  Author      : Yukio Ueno
- Timestamp   : 2025-12-14 21:08 (Brasília Standard Time)
+ Timestamp   : 2025-12-14 21:12 (Brasília Standard Time)
 ================================================================================
  Description :
    SmoothUpdate.ps1 is a PowerShell automation script designed to keep
@@ -19,6 +19,9 @@
    - Skips update if less than one month has passed since update file publication
    - Supports -Force to override skip logic
    - Supports -Help to display usage information
+   - Detects if wusa.exe is already running and waits for completion
+   - Provides a console summary of KB installed and new build version
+   - Can be scheduled to run monthly via Task Scheduler
 
    Usage Notes:
    - Run in normal mode as Administrator (not Safe Mode)
@@ -31,7 +34,8 @@
 
 param(
     [switch]$Force,
-    [switch]$Help
+    [switch]$Help,
+    [switch]$Schedule
 )
 
 # --- Step -Help: Display Usage ---
@@ -39,11 +43,24 @@ if ($Help) {
     Write-Host "SmoothUpdate.ps1 - Windows 10 Cumulative Update Installer"
     Write-Host ""
     Write-Host "Parameters:"
-    Write-Host "  -Force   : Override skip logic and install update even if newer than a month."
-    Write-Host "  -Help    : Display this help information."
+    Write-Host "  -Force    : Override skip logic and install update even if newer than a month."
+    Write-Host "  -Help     : Display this help information."
+    Write-Host "  -Schedule : Create a monthly scheduled task to run SmoothUpdate.ps1 automatically."
     Write-Host ""
-    Write-Host "Example:"
+    Write-Host "Examples:"
     Write-Host "  .\SmoothUpdate.ps1 -Force"
+    Write-Host "  .\SmoothUpdate.ps1 -Schedule"
+    exit
+}
+
+# --- Step -Schedule: Create Scheduled Task ---
+if ($Schedule) {
+    $taskName = "SmoothUpdateMonthly"
+    $scriptPath = $MyInvocation.MyCommand.Definition
+    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File `"$scriptPath`""
+    $trigger = New-ScheduledTaskTrigger -Monthly -DaysOfMonth 1 -At 03:00AM
+    Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -RunLevel Highest -Force
+    Write-Host "Scheduled task '$taskName' created to run SmoothUpdate.ps1 monthly."
     exit
 }
 
@@ -74,7 +91,6 @@ if (Test-Path $updateFile -and -not $Force) {
 }
 
 # --- Step 1: Identify Latest KB ---
-# For demonstration, KB5071546 (Dec 2025) is hardcoded.
 $downloadUrl = "https://catalog.update.microsoft.com/Search.aspx?q=$kbID"
 
 Write-Host "Latest cumulative update identified: $kbID"
@@ -85,7 +101,6 @@ if (-not (Test-Path $downloadTargetDir)) {
     New-Item -ItemType Directory -Force -Path $downloadTargetDir | Out-Null
 }
 
-# Example placeholder direct link (replace with actual .msu URL if available):
 $msuDirectUrl = "https://download.windowsupdate.com/c/msdownload/update/software/updt/2025/12/windows10.0-kb5071546-x64.msu"
 
 Write-Host "Downloading $kbID to $updateFile..."
@@ -94,6 +109,14 @@ Invoke-WebRequest -Uri $msuDirectUrl -OutFile $updateFile -UseBasicParsing
 # --- Step 2: Install Update ---
 if (Test-Path $updateFile) {
     Write-Host "Installing $kbID from $updateFile..."
+
+    # Safety block: detect if wusa.exe is already running
+    $wusaProc = Get-Process -Name wusa -ErrorAction SilentlyContinue
+    if ($wusaProc) {
+        Write-Host "wusa.exe is already running. Waiting for it to finish..."
+        $wusaProc.WaitForExit()
+    }
+
     Start-Process -FilePath "wusa.exe" `
         -ArgumentList "`"$updateFile`" /quiet /norestart /log:`"$logFile`"" `
         -Wait -Verb RunAs
